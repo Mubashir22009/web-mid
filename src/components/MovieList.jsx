@@ -30,7 +30,7 @@ export default function MovieList() {
                     })
                 )
             })
-        }, 500);
+        }, 50);
 
         return () => clearTimeout(timeoutID);
         
