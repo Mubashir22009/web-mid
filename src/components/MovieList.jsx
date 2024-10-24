@@ -1,67 +1,51 @@
 import { useEffect, useState } from "react"
 import "../index.css"
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 export default function MovieList() {
 
     const [movies, setMovies] = useState(
-        {
-            "trending": [],
-        }
+        []
     );
 
     useEffect(() => {
-        //TODO: api fetch instead
-        setMovies(
-            {
-                "trending": [
-                    {
-                        "id": 1,
-                        "name": "Movie 1",
-                        "description": "Cool Movie 1",
-                        "cover": null
-                    },
-                    {
-                        "id": 2,
-                        "name": "Movie 2",
-                        "description": "Cool Movie 2",
-                        "cover": null
-                    },
-                    {
-                        "id": 3,
-                        "name": "Movie 3",
-                        "description": "Cool Movie 3",
-                        "cover": null
-                    },
-                    {
-                        "id": 4,
-                        "name": "Movie 4",
-                        "description": "Cool Movie 4",
-                        "cover": null
-                    },
-                    {
-                        "id": 5,
-                        "name": "Movie 5",
-                        "description": "Cool Movie 5",
-                        "cover": null
-                    }
-
-                ]
-            }
-        )
+        axios
+            .get("https://api.mangadex.org/manga?contentRating[]=safe")
+            .then(respnse => {
+                setMovies(
+                    respnse.data.data.map(m => {
+                        return {
+                            "id": m.id,
+                            "name": m.attributes.title.en,
+                            "description": m.attributes.description.en,
+                            "tags": m.attributes.tags.map(tag => {
+                                tag.attributes.name.en
+                            })
+                        }
+                    })
+                )
+            })
     }, []);
+
+    console.log(movies)
 
     return (
         <>
-            <h2 className="flex text-3xl">Trending</h2>
+            <h2 className="flex text-3xl">Mangas</h2>
             <ul>
-                {movies.trending.map(x => {
+                {movies.map(x => {
                     return <li key={x.id}>
                         <div className="flex">
                             <Link to={"/movie/" + x.id}>
                                 <h4>{x.name}</h4>
-                                <p>{x.description}</p>
                             </Link>
+                                <p>{x.description}</p>
+                                <div className="flex justify-between space-x-4">
+                                {x.tags.map(tag => {
+                                    return <span key={tag}>{tag}</span>
+                                })}
+                                </div>
                         </div>
                     </li>;
                 })}
