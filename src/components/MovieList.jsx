@@ -9,9 +9,13 @@ export default function MovieList() {
         []
     );
 
+    const [search, setSearch] = useState('');
+
     useEffect(() => {
-        axios
-            .get("https://api.mangadex.org/manga?contentRating[]=safe")
+        // timeout to not hit api on every character change
+        const timeoutID = setTimeout(() => {
+            axios
+            .get("https://api.mangadex.org/manga?order[rating]=desc&contentRating[]=safe&title=" + search)
             .then(respnse => {
                 setMovies(
                     respnse.data.data.map(m => {
@@ -26,13 +30,26 @@ export default function MovieList() {
                     })
                 )
             })
-    }, []);
+        }, 500);
+
+        return () => clearTimeout(timeoutID);
+        
+    }, [search]);
 
     console.log(movies)
 
     return (
         <>
             <h2 className="flex text-3xl">Mangas</h2>
+            <div>
+                <input 
+                    type="text"
+                    placeholder="Search..."
+                    value={search}
+                    onChange={(e) => {
+                        setSearch(e.target.value);
+                    }} />
+            </div>
             <ul>
                 {movies.map(x => {
                     return <li key={x.id}>
